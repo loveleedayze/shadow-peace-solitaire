@@ -1,0 +1,10 @@
+{
+  "name": "Shadow Peace Solitaire",
+  "short_name": "Solitaire",
+  "description": "A zen solitaire experience with daily challenges and premium card backs",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#8a2be2",
+  "icons": []
+}
