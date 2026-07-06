@@ -1,0 +1,2618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Shadow Peace Solitaire - Daily challenges, premium card backs, and zen gameplay" />
+<meta name="theme-color" content="#8a2be2" />
+<link rel="manifest" href="manifest.json" />
+<title>Shadow Peace Solitaire - Daily Challenge</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+  font-family: system-ui, -apple-system, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  color: #ddd;
+  padding: 20px;
+  transition: background 0.5s ease, color 0.5s ease;
+}
+
+/* LIGHT MODE */
+body.light-mode {
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8eaf6 100%);
+  color: #333;
+}
+
+body.light-mode #game {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 40px rgba(138, 43, 226, 0.2);
+}
+
+body.light-mode #header {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode .stat-value,
+body.light-mode .stat-box-value,
+body.light-mode .win-stat-value,
+body.light-mode .shop-item h3 {
+  color: #7b1fa2;
+}
+
+body.light-mode .btn {
+  background: rgba(138, 43, 226, 0.15);
+  color: #333;
+}
+
+body.light-mode .btn:hover {
+  background: rgba(138, 43, 226, 0.25);
+}
+
+body.light-mode .foundation,
+body.light-mode .pile {
+  background: rgba(138, 43, 226, 0.08);
+  border-color: rgba(138, 43, 226, 0.3);
+}
+
+body.light-mode .challenge-banner {
+  background: linear-gradient(135deg, #9c27b0, #e1bee7);
+}
+
+body.light-mode .modal {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+body.light-mode .modal-content {
+  background: rgba(255, 255, 255, 0.98);
+  color: #333;
+}
+
+body.light-mode .modal-content h2 {
+  color: #7b1fa2;
+}
+
+body.light-mode .shop-item {
+  background: rgba(138, 43, 226, 0.05);
+  border-color: rgba(138, 43, 226, 0.3);
+}
+
+body.light-mode .shop-item p,
+body.light-mode .stat-box-label {
+  color: #666;
+}
+
+body.light-mode .stat-box {
+  background: rgba(138, 43, 226, 0.05);
+  border-color: rgba(138, 43, 226, 0.3);
+}
+
+body.light-mode .nav-btn {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(138, 43, 226, 0.4);
+  color: #333;
+}
+
+body.light-mode .nav-btn:hover {
+  background: rgba(138, 43, 226, 0.15);
+}
+
+body.light-mode #sound-toggle {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(138, 43, 226, 0.4);
+  color: #333;
+}
+
+body.light-mode #sound-toggle:hover {
+  background: rgba(138, 43, 226, 0.15);
+}
+
+body.light-mode #menu-toggle {
+  background: rgba(138, 43, 226, 0.9);
+  border-color: rgba(138, 43, 226, 0.8);
+}
+
+body.light-mode #menu-toggle.active {
+  background: rgba(220, 53, 69, 0.9);
+  border-color: rgba(220, 53, 69, 0.8);
+}
+
+#game {
+  width: min(100%, 420px);
+  background: rgba(26, 26, 26, 0.95);
+  border-radius: 20px;
+  padding: 16px;
+  position: relative;
+  box-shadow: 0 0 40px rgba(138, 43, 226, 0.3);
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+/* HEADER */
+#header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+#score-panel {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-value {
+  display: block;
+  font-size: 16px;
+  font-weight: bold;
+  color: #8a2be2;
+}
+
+#controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 8px 12px;
+  background: rgba(138, 43, 226, 0.3);
+  border: 1px solid rgba(138, 43, 226, 0.5);
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.3s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.btn:hover {
+  background: rgba(138, 43, 226, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-icon {
+  padding: 8px;
+  font-size: 16px;
+}
+
+.btn-premium {
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  color: #000;
+  border-color: #ffd700;
+  font-weight: bold;
+}
+
+.btn-premium:hover {
+  background: linear-gradient(135deg, #ffed4e, #ffd700);
+}
+
+/* TOP ROW */
+#top-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: 100%;
+}
+
+#top-row.draw-left .foundation-group {
+  order: 2;
+}
+
+#top-row.draw-left .pile-group {
+  order: 1;
+}
+
+.foundation-group, .pile-group {
+  display: flex;
+  gap: 3px;
+}
+
+.foundation, .pile {
+  width: 48px;
+  height: 66px;
+  border-radius: 8px;
+  border: 2px dashed rgba(138, 43, 226, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: rgba(0, 0, 0, 0.3);
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+
+.foundation.valid-drop, .pile.valid-drop {
+  border-color: rgba(138, 43, 226, 0.8);
+  background: rgba(138, 43, 226, 0.2);
+  box-shadow: 0 0 20px rgba(138, 43, 226, 0.4);
+}
+
+.foundation::before {
+  content: attr(data-suit);
+  font-size: 20px;
+  opacity: 0.2;
+}
+
+#draw-pile {
+  cursor: pointer;
+  border-style: solid;
+  background: rgba(138, 43, 226, 0.15);
+}
+
+#draw-pile:hover {
+  transform: scale(1.05);
+  border-color: rgba(138, 43, 226, 0.6);
+}
+
+#draw-pile::before {
+  content: '🎴';
+  font-size: 24px;
+  opacity: 0.6;
+}
+
+#draw-pile.empty::before {
+  content: '↻';
+  font-size: 28px;
+}
+
+/* TABLEAU */
+#tableau {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  gap: 4px;
+  width: 100%;
+  overflow: visible;
+}
+
+.column {
+  flex: 1;
+  min-width: 0;
+  min-height: 300px;
+  position: relative;
+  border-radius: 10px;
+  border: 2px dashed transparent;
+  transition: all 0.3s;
+  padding: 2px;
+}
+
+.column.valid-drop {
+  border-color: rgba(138, 43, 226, 0.6);
+  background: rgba(138, 43, 226, 0.1);
+}
+
+/* CARD */
+.card {
+  width: 100%;
+  aspect-ratio: 5/7;
+  max-width: 100%;
+  border-radius: 6px;
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  color: #111;
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: grab;
+  position: absolute;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: box-shadow 0.2s;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.card:active {
+  cursor: grabbing;
+}
+
+.card.red {
+  color: #c41e3a;
+}
+
+.card.face-down {
+  cursor: default;
+}
+
+/* Card Back Designs */
+.card.face-down.back-default {
+  background: linear-gradient(145deg, #4a148c, #6a1b9a);
+}
+
+.card.face-down.back-galaxy {
+  background: radial-gradient(circle at 30% 40%, #1e3a8a, #7c3aed, #ec4899);
+}
+
+.card.face-down.back-forest {
+  background: linear-gradient(145deg, #064e3b, #10b981, #34d399);
+}
+
+.card.face-down.back-sunset {
+  background: linear-gradient(145deg, #dc2626, #fb923c, #fbbf24);
+}
+
+.card.face-down.back-ocean {
+  background: linear-gradient(145deg, #0c4a6e, #0ea5e9, #38bdf8);
+}
+
+.card.face-down.back-royal {
+  background: linear-gradient(145deg, #7c2d12, #dc2626, #fbbf24);
+}
+
+.card.face-down.back-mint {
+  background: linear-gradient(145deg, #065f46, #34d399, #a7f3d0);
+}
+
+.card.face-down.back-lavender {
+  background: linear-gradient(145deg, #5b21b6, #a78bfa, #ddd6fe);
+}
+
+.card.face-down.back-crimson {
+  background: linear-gradient(145deg, #881337, #e11d48, #fb7185);
+}
+
+.card.face-down.back-midnight {
+  background: linear-gradient(145deg, #1e1b4b, #4338ca, #818cf8);
+}
+
+.card.face-down.back-emerald {
+  background: linear-gradient(145deg, #14532d, #16a34a, #86efac);
+}
+
+.card.face-down::before {
+  content: '✦';
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 24px;
+}
+
+.card.dragging {
+  opacity: 0.85;
+  box-shadow: 0 8px 20px rgba(138, 43, 226, 0.6);
+  z-index: 1000 !important;
+  pointer-events: none;
+  transition: none;
+}
+
+.card.highlight {
+  animation: highlight-pulse 0.6s ease;
+}
+
+@keyframes highlight-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); box-shadow: 0 0 20px rgba(138, 43, 226, 0.8); }
+}
+
+/* MODALS */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.modal.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal-content {
+  background: rgba(26, 26, 26, 0.98);
+  border: 2px solid rgba(138, 43, 226, 0.8);
+  border-radius: 20px;
+  padding: 30px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 0 50px rgba(138, 43, 226, 0.6);
+  position: relative;
+}
+
+.modal-content h2 {
+  margin: 0 0 20px;
+  color: #8a2be2;
+  font-size: 24px;
+  text-align: center;
+}
+
+.modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(90deg);
+}
+
+/* SHOP */
+.shop-grid {
+  display: grid;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.shop-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(138, 43, 226, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s;
+}
+
+.shop-item:hover {
+  border-color: rgba(138, 43, 226, 0.6);
+  transform: translateY(-2px);
+}
+
+.shop-item.owned {
+  border-color: rgba(16, 185, 129, 0.6);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.shop-item h3 {
+  margin: 0 0 10px;
+  color: #8a2be2;
+  font-size: 18px;
+}
+
+.shop-item.owned h3 {
+  color: #10b981;
+}
+
+.shop-item p {
+  margin: 0 0 15px;
+  font-size: 14px;
+  color: #aaa;
+}
+
+.shop-price {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.price-tag {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffd700;
+}
+
+.owned-badge {
+  background: rgba(16, 185, 129, 0.3);
+  color: #10b981;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.quantity-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 5px 10px;
+  border-radius: 8px;
+}
+
+.quantity-btn {
+  background: rgba(138, 43, 226, 0.3);
+  border: 1px solid rgba(138, 43, 226, 0.5);
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.quantity-btn:hover {
+  background: rgba(138, 43, 226, 0.5);
+}
+
+.quantity-display {
+  min-width: 40px;
+  text-align: center;
+  font-weight: bold;
+  color: #8a2be2;
+}
+
+/* CARD BACKS SELECTOR */
+.cardback-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.cardback-option {
+  aspect-ratio: 5/7;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.cardback-option:hover {
+  transform: scale(1.05);
+}
+
+.cardback-option.selected {
+  border-color: #8a2be2;
+  box-shadow: 0 0 20px rgba(138, 43, 226, 0.6);
+}
+
+.cardback-option.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cardback-option.locked::after {
+  content: '🔒';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 32px;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+/* DAILY CHALLENGE */
+.challenge-banner {
+  background: linear-gradient(135deg, #8a2be2, #da70d6);
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.challenge-banner:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(138, 43, 226, 0.5);
+}
+
+.challenge-banner::before {
+  content: '⭐';
+  position: absolute;
+  font-size: 60px;
+  opacity: 0.1;
+  top: -10px;
+  right: -10px;
+}
+
+.challenge-banner h3 {
+  margin: 0 0 5px;
+  font-size: 18px;
+  color: #fff;
+}
+
+.challenge-timer {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* STATS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.stat-box {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(138, 43, 226, 0.3);
+  border-radius: 12px;
+  padding: 15px;
+  text-align: center;
+}
+
+.stat-box-value {
+  display: block;
+  font-size: 32px;
+  font-weight: bold;
+  color: #8a2be2;
+  margin-bottom: 5px;
+}
+
+.stat-box-label {
+  font-size: 12px;
+  color: #aaa;
+}
+
+/* AUTO COMPLETE */
+#autocomplete-btn {
+  background: linear-gradient(135deg, #10b981, #34d399);
+  color: #000;
+  border-color: #10b981;
+  font-weight: bold;
+}
+
+#autocomplete-btn:hover {
+  background: linear-gradient(135deg, #34d399, #10b981);
+}
+
+#autocomplete-btn:disabled {
+  background: rgba(138, 43, 226, 0.3);
+  color: #fff;
+}
+
+/* PEACE MESSAGE */
+#peace-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+  opacity: 0;
+  letter-spacing: 2px;
+  text-shadow: 0 0 20px rgba(138, 43, 226, 0.8);
+  transition: opacity 1.2s ease;
+  pointer-events: none;
+  z-index: 2000;
+  text-align: center;
+}
+
+/* CONFETTI */
+.confetti {
+  position: absolute;
+  width: 8px;
+  height: 12px;
+  animation: fall 3s linear forwards;
+  pointer-events: none;
+}
+
+@keyframes fall {
+  from {
+    transform: translateY(-20px) rotate(0deg);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(700px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* PEACE OUTLINE */
+.peace-outline {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 3px solid rgba(138, 43, 226, 0.6);
+  animation: pulse 2s ease-out forwards;
+  pointer-events: none;
+  z-index: 1999;
+}
+
+@keyframes pulse {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2);
+  }
+}
+
+/* SOUND TOGGLE */
+#sound-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(138, 43, 226, 0.3);
+  border: 1px solid rgba(138, 43, 226, 0.5);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 20px;
+  transition: all 0.3s;
+  z-index: 100;
+}
+
+#sound-toggle:hover {
+  background: rgba(138, 43, 226, 0.5);
+  transform: scale(1.1);
+}
+
+/* NAV BUTTONS */
+#nav-buttons {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 100;
+  transition: transform 0.3s ease;
+}
+
+#nav-buttons.collapsed {
+  transform: translateX(calc(100% + 20px));
+}
+
+#menu-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(138, 43, 226, 0.9);
+  border: 2px solid rgba(138, 43, 226, 0.8);
+  color: #fff;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 101;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(138, 43, 226, 0.5);
+}
+
+#menu-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(138, 43, 226, 0.7);
+}
+
+#menu-toggle.active {
+  background: rgba(220, 53, 69, 0.9);
+  border-color: rgba(220, 53, 69, 0.8);
+}
+
+.nav-btn {
+  background: rgba(26, 26, 26, 0.95);
+  border: 2px solid rgba(138, 43, 226, 0.5);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.3s;
+  backdrop-filter: blur(10px);
+  white-space: nowrap;
+  min-width: 140px;
+  text-align: center;
+}
+
+.nav-btn:hover {
+  background: rgba(138, 43, 226, 0.3);
+  transform: translateY(-2px);
+  border-color: rgba(138, 43, 226, 0.8);
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+  #game {
+    padding: 12px;
+  }
+  
+  .card {
+    font-size: 14px;
+  }
+  
+  #header {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .btn {
+    font-size: 10px;
+    padding: 6px 10px;
+  }
+  
+  .cardback-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  #nav-buttons {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 768px) {
+  #game {
+    width: 700px;
+  }
+  
+  .card {
+    font-size: 20px;
+  }
+  
+  .foundation, .pile {
+    width: 80px;
+    height: 112px;
+  }
+  
+  .foundation::before {
+    font-size: 28px;
+  }
+  
+  #draw-pile::before {
+    font-size: 32px;
+  }
+  
+  #draw-pile.empty::before {
+    font-size: 36px;
+  }
+  
+  .foundation-group, .pile-group {
+    gap: 6px;
+  }
+  
+  #top-row {
+    gap: 8px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="sound-toggle" title="Toggle Sound">🔊</div>
+
+<button id="menu-toggle" title="Toggle Menu">☰</button>
+
+<div id="nav-buttons" class="collapsed">
+  <button class="nav-btn" id="shop-nav-btn">🛒 Shop</button>
+  <button class="nav-btn" id="stats-nav-btn">📊 Stats</button>
+  <button class="nav-btn" id="cardback-nav-btn">🎨 Card Backs</button>
+  <button class="nav-btn" id="settings-nav-btn">⚙️ Settings</button>
+</div>
+
+<div id="game">
+  
+  <!-- DAILY CHALLENGE BANNER -->
+  <div class="challenge-banner" id="challenge-banner">
+    <h3>🌟 Daily Challenge 🌟</h3>
+    <div class="challenge-timer" id="challenge-timer">Next challenge in: --:--:--</div>
+  </div>
+
+  <!-- HEADER -->
+  <div id="header">
+    <div id="score-panel">
+      <div class="stat">
+        <span class="stat-value" id="moves">0</span>
+        <span>Moves</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" id="score">0</span>
+        <span>Score</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" id="timer">0:00</span>
+        <span>Time</span>
+      </div>
+    </div>
+    
+    <div id="controls">
+      <button class="btn btn-icon" id="undo-btn" title="Undo">↶ <span id="undo-count">3</span></button>
+      <button class="btn btn-icon" id="hint-btn" title="Hint">💡 <span id="hint-count">3</span></button>
+      <button class="btn" id="autocomplete-btn" title="Auto-complete">✨ Auto</button>
+      <button class="btn" id="new-game-btn">New Game</button>
+    </div>
+  </div>
+
+  <!-- TOP ROW -->
+  <div id="top-row">
+    <div class="foundation-group">
+      <div class="foundation" data-suit="♠" data-index="0"></div>
+      <div class="foundation" data-suit="♥" data-index="1"></div>
+      <div class="foundation" data-suit="♦" data-index="2"></div>
+      <div class="foundation" data-suit="♣" data-index="3"></div>
+    </div>
+
+    <div class="pile-group">
+      <div id="waste-pile" class="pile"></div>
+      <div id="draw-pile" class="pile"></div>
+    </div>
+  </div>
+
+  <!-- TABLEAU -->
+  <div id="tableau">
+    <div class="column" data-index="0"></div>
+    <div class="column" data-index="1"></div>
+    <div class="column" data-index="2"></div>
+    <div class="column" data-index="3"></div>
+    <div class="column" data-index="4"></div>
+    <div class="column" data-index="5"></div>
+    <div class="column" data-index="6"></div>
+  </div>
+
+  <!-- PEACE MESSAGE -->
+  <div id="peace-message">peace, love, and hairgrease</div>
+
+</div>
+
+<!-- WIN MODAL -->
+<div class="modal" id="win-modal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('win-modal')">×</button>
+    <h2>🎉 Victory! 🎉</h2>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <span class="stat-box-value" id="win-moves">0</span>
+        <span class="stat-box-label">Moves</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-box-value" id="win-score">0</span>
+        <span class="stat-box-label">Score</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-box-value" id="win-time">0:00</span>
+        <span class="stat-box-label">Time</span>
+      </div>
+      <div class="stat-box" id="daily-complete-box" style="display: none;">
+        <span class="stat-box-value">✅</span>
+        <span class="stat-box-label">Daily Challenge</span>
+      </div>
+    </div>
+    <button class="btn" id="play-again-btn" style="width: 100%; margin-top: 20px;">Play Again</button>
+  </div>
+</div>
+
+<!-- SHOP MODAL -->
+<div class="modal" id="shop-modal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('shop-modal')">×</button>
+    <h2>🛒 Premium Shop</h2>
+    <div class="shop-grid" id="shop-items"></div>
+  </div>
+</div>
+
+<!-- STATS MODAL -->
+<div class="modal" id="stats-modal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('stats-modal')">×</button>
+    <h2>📊 Your Statistics</h2>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <span class="stat-box-value" id="total-games">0</span>
+        <span class="stat-box-label">Games Played</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-box-value" id="total-wins">0</span>
+        <span class="stat-box-label">Wins</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-box-value" id="win-rate">0%</span>
+        <span class="stat-box-label">Win Rate</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-box-value" id="current-streak">0</span>
+        <span class="stat-box-label">Current Streak</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-box-value" id="best-streak">0</span>
+        <span class="stat-box-label">Best Streak</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-box-value" id="best-score">0</span>
+        <span class="stat-box-label">Best Score</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-box-value" id="daily-completed">0</span>
+        <span class="stat-box-label">Daily Challenges</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-box-value" id="total-time">0:00</span>
+        <span class="stat-box-label">Total Time</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CARD BACKS MODAL -->
+<div class="modal" id="cardback-modal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('cardback-modal')">×</button>
+    <h2>🎨 Select Card Back</h2>
+    <div class="cardback-grid" id="cardback-options"></div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal" id="settings-modal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('settings-modal')">×</button>
+    <h2>⚙️ Settings</h2>
+    <div class="stats-grid" style="grid-template-columns: 1fr;">
+      <div class="stat-box" style="cursor: pointer;" id="theme-setting">
+        <span class="stat-box-value">🌙</span>
+        <span class="stat-box-label">Theme: Dark Mode</span>
+        <p style="margin-top: 10px; font-size: 12px; color: #aaa;">Tap to toggle</p>
+      </div>
+      <div class="stat-box" style="cursor: pointer;" id="draw-side-setting">
+        <span class="stat-box-value">➡️</span>
+        <span class="stat-box-label">Draw Pile: Right Side</span>
+        <p style="margin-top: 10px; font-size: 12px; color: #aaa;">Tap to switch sides</p>
+      </div>
+      <div class="stat-box" style="cursor: pointer;" id="sound-setting">
+        <span class="stat-box-value">🔊</span>
+        <span class="stat-box-label">Sound Effects: On</span>
+        <p style="margin-top: 10px; font-size: 12px; color: #aaa;">Tap to toggle</p>
+      </div>
+      <div class="stat-box" style="cursor: pointer;" id="music-setting">
+        <span class="stat-box-value">🔇</span>
+        <span class="stat-box-label">Music: Off</span>
+        <p style="margin-top: 10px; font-size: 12px; color: #aaa;">Tap to toggle</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ==================== GAME STATE ==================== */
+const gameState = {
+  deck: [],
+  drawPile: [],
+  wastePile: [],
+  foundations: [[],[],[],[]],
+  tableau: [[],[],[],[],[],[],[]],
+  moves: 0,
+  score: 0,
+  undoStack: [],
+  undoCount: 3,
+  hintCount: 3,
+  timer: 0,
+  timerInterval: null,
+  soundEnabled: true,
+  musicEnabled: false,
+  hasPeaceBack: false,
+  peaceBackExpires: null,
+  isDailyChallenge: false,
+  dailySeed: null
+};
+
+/* ==================== PREMIUM STATE ==================== */
+const premiumState = {
+  ownedItems: [],
+  unlimitedUndos: false,
+  unlimitedHints: false,
+  autoComplete: false,
+  cardBackPack: false,
+  selectedCardBack: 'default',
+  drawPileOnRight: true,
+  theme: 'dark'
+};
+
+/* ==================== STATISTICS ==================== */
+const stats = {
+  totalGames: 0,
+  totalWins: 0,
+  currentStreak: 0,
+  bestStreak: 0,
+  bestScore: 0,
+  dailyChallengesCompleted: 0,
+  totalTime: 0,
+  completedDailies: []
+};
+
+/* ==================== CARD BACKS ==================== */
+const cardBacks = [
+  { id: 'default', name: 'Purple Shadow', class: 'back-default', premium: false },
+  { id: 'galaxy', name: 'Galaxy', class: 'back-galaxy', premium: true },
+  { id: 'forest', name: 'Forest', class: 'back-forest', premium: true },
+  { id: 'sunset', name: 'Sunset', class: 'back-sunset', premium: true },
+  { id: 'ocean', name: 'Ocean', class: 'back-ocean', premium: true },
+  { id: 'royal', name: 'Royal', class: 'back-royal', premium: true },
+  { id: 'mint', name: 'Mint', class: 'back-mint', premium: true },
+  { id: 'lavender', name: 'Lavender', class: 'back-lavender', premium: true },
+  { id: 'crimson', name: 'Crimson', class: 'back-crimson', premium: true },
+  { id: 'midnight', name: 'Midnight', class: 'back-midnight', premium: true },
+  { id: 'emerald', name: 'Emerald', class: 'back-emerald', premium: true }
+];
+
+/* ==================== SHOP ITEMS ==================== */
+const shopItems = [
+  {
+    id: 'undo_pack_10',
+    name: '10 Undo Pack',
+    description: 'Add 10 undos to your current game',
+    price: 0.99,
+    emoji: '↶',
+    type: 'consumable',
+    quantity: 10
+  },
+  {
+    id: 'undo_pack_50',
+    name: '50 Undo Pack',
+    description: 'Add 50 undos - Best Value!',
+    price: 3.99,
+    emoji: '↶↶',
+    type: 'consumable',
+    quantity: 50,
+    badge: '20% OFF'
+  },
+  {
+    id: 'hint_pack_10',
+    name: '10 Hint Pack',
+    description: 'Add 10 hints to your current game',
+    price: 0.99,
+    emoji: '💡',
+    type: 'consumable',
+    quantity: 10
+  },
+  {
+    id: 'card_back_pack',
+    name: 'Card Back Pack',
+    description: '10 beautiful card back designs',
+    price: 2.99,
+    emoji: '🎨',
+    type: 'permanent'
+  },
+  {
+    id: 'unlimited_hints',
+    name: 'Unlimited Hints',
+    description: 'Never run out of hints again',
+    price: 4.99,
+    emoji: '💡',
+    type: 'permanent'
+  },
+  {
+    id: 'unlimited_undos',
+    name: 'Unlimited Undos',
+    description: 'Undo as many times as you want',
+    price: 4.99,
+    emoji: '↶',
+    type: 'permanent'
+  },
+  {
+    id: 'auto_complete',
+    name: 'Auto-Complete',
+    description: 'Finish games automatically when solvable',
+    price: 1.99,
+    emoji: '✨',
+    type: 'permanent'
+  },
+  {
+    id: 'complete_bundle',
+    name: 'Complete Bundle',
+    description: 'All permanent upgrades! Save $4',
+    price: 9.99,
+    emoji: '🎁',
+    type: 'permanent',
+    badge: 'BEST DEAL'
+  }
+];
+
+/* ==================== SOUND SYSTEM ==================== */
+const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+try {
+  audioCtx = new AudioContextClass();
+} catch (e) {
+  console.log('Audio unavailable:', e);
+}
+
+function playSound(type) {
+  if (!gameState.soundEnabled || !audioCtx) return;
+  
+  // Resume audio context if suspended (browser autoplay policy)
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  
+  const oscillator = audioCtx.createOscillator();
+  const gainNode = audioCtx.createGain();
+  
+  oscillator.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+  
+  switch(type) {
+    case 'card':
+      oscillator.frequency.value = 400;
+      gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + 0.1);
+      break;
+    case 'foundation':
+      oscillator.frequency.value = 600;
+      gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + 0.2);
+      break;
+    case 'win':
+      [523, 659, 784].forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime + i * 0.15);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.15 + 0.4);
+        osc.start(audioCtx.currentTime + i * 0.15);
+        osc.stop(audioCtx.currentTime + i * 0.15 + 0.4);
+      });
+      break;
+    case 'peace':
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.5);
+      gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + 0.5);
+      break;
+    case 'purchase':
+      [523, 659, 784, 1047].forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime + i * 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.1 + 0.3);
+        osc.start(audioCtx.currentTime + i * 0.1);
+        osc.stop(audioCtx.currentTime + i * 0.1 + 0.3);
+      });
+      break;
+  }
+}
+
+/* ==================== BACKGROUND MUSIC ==================== */
+let musicOscillator = null;
+let musicGain = null;
+let musicInterval = null;
+
+function startBackgroundMusic() {
+  if (musicOscillator || !audioCtx) return; // Already playing or audio unavailable
+  
+  // Resume audio context if suspended
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  
+  // Create nodes
+  musicOscillator = audioCtx.createOscillator();
+  musicGain = audioCtx.createGain();
+  const filter = audioCtx.createBiquadFilter();
+  
+  // Configure
+  musicOscillator.type = 'sine';
+  musicOscillator.frequency.value = 220;
+  filter.type = 'lowpass';
+  filter.frequency.value = 800;
+  musicGain.gain.value = 0.03; // Very quiet ambient music
+  
+  // Connect
+  musicOscillator.connect(filter);
+  filter.connect(musicGain);
+  musicGain.connect(audioCtx.destination);
+  
+  // Start
+  musicOscillator.start();
+  
+  // Gentle melody pattern (peaceful)
+  const notes = [220, 246.94, 261.63, 293.66, 329.63, 349.23]; // A, B, C, D, E, F
+  let noteIndex = 0;
+  
+  musicInterval = setInterval(() => {
+    if (musicOscillator && gameState.musicEnabled) {
+      noteIndex = (noteIndex + 1) % notes.length;
+      musicOscillator.frequency.exponentialRampToValueAtTime(
+        notes[noteIndex],
+        audioCtx.currentTime + 2
+      );
+    }
+  }, 2000);
+}
+
+function stopBackgroundMusic() {
+  if (musicOscillator) {
+    musicOscillator.stop();
+    musicOscillator = null;
+  }
+  if (musicGain) {
+    musicGain = null;
+  }
+  if (musicInterval) {
+    clearInterval(musicInterval);
+    musicInterval = null;
+  }
+}
+
+function toggleBackgroundMusic() {
+  if (gameState.musicEnabled) {
+    startBackgroundMusic();
+  } else {
+    stopBackgroundMusic();
+  }
+}
+
+/* ==================== DAILY CHALLENGE ==================== */
+function getDailySeed() {
+  const today = new Date();
+  const dateString = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+  return hashString(dateString);
+}
+
+function hashString(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash);
+}
+
+function getNextDailyTime() {
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+  return tomorrow;
+}
+
+function updateDailyTimer() {
+  const now = new Date();
+  const next = getNextDailyTime();
+  const diff = next - now;
+  
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+  
+  document.getElementById('challenge-timer').textContent = 
+    `Next challenge in: ${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+setInterval(updateDailyTimer, 1000);
+updateDailyTimer();
+
+/* ==================== DECK INITIALIZATION ==================== */
+const suits = ['♠','♥','♦','♣'];
+const values = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+const valueMap = {'A':1,'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13};
+
+function createDeck(seed = null) {
+  const deck = [];
+  suits.forEach(suit => {
+    values.forEach(value => {
+      deck.push({
+        suit,
+        value,
+        numValue: valueMap[value],
+        color: (suit === '♥' || suit === '♦') ? 'red' : 'black',
+        faceUp: false
+      });
+    });
+  });
+  return shuffleDeck(deck, seed);
+}
+
+function shuffleDeck(deck, seed = null) {
+  if (seed !== null) {
+    let rng = seed;
+    for (let i = deck.length - 1; i > 0; i--) {
+      rng = (rng * 9301 + 49297) % 233280;
+      const j = Math.floor((rng / 233280) * (i + 1));
+      [deck[i], deck[j]] = [deck[j], deck[i]];
+    }
+  } else {
+    for (let i = deck.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [deck[i], deck[j]] = [deck[j], deck[i]];
+    }
+  }
+  return deck;
+}
+
+/* ==================== GAME INITIALIZATION ==================== */
+function initGame(isDailyChallenge = false) {
+  const seed = isDailyChallenge ? getDailySeed() : null;
+  gameState.deck = createDeck(seed);
+  gameState.drawPile = [];
+  gameState.wastePile = [];
+  gameState.foundations = [[],[],[],[]];
+  gameState.tableau = [[],[],[],[],[],[],[]];
+  gameState.moves = 0;
+  gameState.score = 0;
+  gameState.undoStack = [];
+  gameState.timer = 0;
+  gameState.isDailyChallenge = isDailyChallenge;
+  gameState.dailySeed = seed;
+  
+  if (premiumState.unlimitedUndos) {
+    gameState.undoCount = 999;
+  } else if (gameState.hasPeaceBack && gameState.peaceBackExpires > Date.now()) {
+    gameState.undoCount = Math.max(3, gameState.undoCount);
+  } else {
+    gameState.undoCount = 3;
+  }
+  
+  if (premiumState.unlimitedHints) {
+    gameState.hintCount = 999;
+  } else if (gameState.hasPeaceBack && gameState.peaceBackExpires > Date.now()) {
+    gameState.hintCount = Math.max(3, gameState.hintCount);
+  } else {
+    gameState.hintCount = 3;
+  }
+  
+  for (let col = 0; col < 7; col++) {
+    for (let row = 0; row <= col; row++) {
+      const card = gameState.deck.pop();
+      card.faceUp = (row === col);
+      gameState.tableau[col].push(card);
+    }
+  }
+  
+  gameState.drawPile = gameState.deck;
+  
+  clearInterval(gameState.timerInterval);
+  gameState.timerInterval = setInterval(updateTimer, 1000);
+  
+  stats.totalGames++;
+  saveStats();
+  
+  renderGame();
+  saveGame();
+}
+
+/* ==================== RENDER ==================== */
+function renderGame() {
+  // Update draw pile position
+  const topRow = document.getElementById('top-row');
+  if (premiumState.drawPileOnRight) {
+    topRow.classList.remove('draw-left');
+  } else {
+    topRow.classList.add('draw-left');
+  }
+  
+  document.getElementById('moves').textContent = gameState.moves;
+  document.getElementById('score').textContent = gameState.score;
+  document.getElementById('undo-count').textContent = premiumState.unlimitedUndos ? '∞' : gameState.undoCount;
+  document.getElementById('hint-count').textContent = premiumState.unlimitedHints ? '∞' : gameState.hintCount;
+  document.getElementById('undo-btn').disabled = gameState.undoStack.length === 0 || (!premiumState.unlimitedUndos && gameState.undoCount === 0);
+  document.getElementById('hint-btn').disabled = !premiumState.unlimitedHints && gameState.hintCount === 0;
+  
+  const autoBtn = document.getElementById('autocomplete-btn');
+  if (premiumState.autoComplete) {
+    autoBtn.disabled = !canAutoComplete();
+  } else {
+    autoBtn.disabled = true;
+    autoBtn.title = 'Purchase Auto-Complete in Shop';
+  }
+  
+  document.querySelectorAll('.column').forEach((col, i) => {
+    col.innerHTML = '';
+    col.style.minHeight = Math.max(300, gameState.tableau[i].length * 25 + 140) + 'px';
+    gameState.tableau[i].forEach((card, j) => {
+      const cardEl = createCardElement(card);
+      cardEl.style.top = `${j * 25}px`;
+      cardEl.style.zIndex = j;
+      cardEl.dataset.location = 'tableau';
+      cardEl.dataset.columnIndex = i;
+      cardEl.dataset.cardIndex = j;
+      col.appendChild(cardEl);
+    });
+  });
+  
+  document.querySelectorAll('.foundation').forEach((found, i) => {
+    found.innerHTML = '';
+    if (gameState.foundations[i].length > 0) {
+      const topCard = gameState.foundations[i][gameState.foundations[i].length - 1];
+      const cardEl = createCardElement(topCard);
+      cardEl.dataset.location = 'foundation';
+      cardEl.dataset.foundationIndex = i;
+      found.appendChild(cardEl);
+    }
+  });
+  
+  const wastePile = document.getElementById('waste-pile');
+  wastePile.innerHTML = '';
+  if (gameState.wastePile.length > 0) {
+    const topCard = gameState.wastePile[gameState.wastePile.length - 1];
+    const cardEl = createCardElement(topCard);
+    cardEl.dataset.location = 'waste';
+    wastePile.appendChild(cardEl);
+  }
+  
+  const drawPile = document.getElementById('draw-pile');
+  if (gameState.drawPile.length === 0) {
+    drawPile.classList.add('empty');
+  } else {
+    drawPile.classList.remove('empty');
+  }
+}
+
+function createCardElement(cardData) {
+  const card = document.createElement('div');
+  card.className = 'card';
+  
+  if (!cardData.faceUp) {
+    card.classList.add('face-down');
+    const backClass = cardBacks.find(b => b.id === premiumState.selectedCardBack)?.class || 'back-default';
+    card.classList.add(backClass);
+  } else {
+    card.textContent = cardData.value + cardData.suit;
+    if (cardData.color === 'red') card.classList.add('red');
+    enableDrag(card, cardData);
+  }
+  
+  return card;
+}
+
+/* ==================== DRAG AND DROP ==================== */
+let draggedCards = [];
+let dragOrigin = null;
+
+let lastTap = { time: 0, card: null };
+
+function enableDrag(cardEl, cardData) {
+  cardEl.addEventListener('pointerdown', (e) => {
+    if (!cardData.faceUp) return;
+    if (e.button !== undefined && e.button !== 0) return;
+
+    const location = cardEl.dataset.location;
+
+    if (location === 'tableau') {
+      const colIndex = parseInt(cardEl.dataset.columnIndex);
+      const cardIndex = parseInt(cardEl.dataset.cardIndex);
+
+      draggedCards = [];
+      for (let i = cardIndex; i < gameState.tableau[colIndex].length; i++) {
+        if (!gameState.tableau[colIndex][i].faceUp) return;
+        draggedCards.push({
+          data: gameState.tableau[colIndex][i],
+          element: cardEl.parentElement.children[i]
+        });
+      }
+
+      for (let i = 1; i < draggedCards.length; i++) {
+        const prev = draggedCards[i - 1].data;
+        const curr = draggedCards[i].data;
+        if (curr.color === prev.color || curr.numValue !== prev.numValue - 1) {
+          draggedCards = [];
+          return;
+        }
+      }
+
+      dragOrigin = { type: 'tableau', colIndex, cardIndex };
+    } else if (location === 'waste') {
+      draggedCards = [{
+        data: cardData,
+        element: cardEl
+      }];
+      dragOrigin = { type: 'waste' };
+    } else if (location === 'foundation') {
+      draggedCards = [{
+        data: cardData,
+        element: cardEl
+      }];
+      dragOrigin = { type: 'foundation', foundationIndex: parseInt(cardEl.dataset.foundationIndex) };
+    } else {
+      return;
+    }
+
+    const startX = e.clientX;
+    const startY = e.clientY;
+    let moved = false;
+
+    const onMove = (ev) => {
+      const deltaX = ev.clientX - startX;
+      const deltaY = ev.clientY - startY;
+
+      if (!moved && Math.abs(deltaX) < 5 && Math.abs(deltaY) < 5) return;
+      moved = true;
+
+      draggedCards.forEach((card, i) => {
+        card.element.classList.add('dragging');
+        card.element.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+        card.element.style.zIndex = 1000 + i;
+      });
+
+      highlightValidDropZones();
+    };
+
+    const cleanup = () => {
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onUp);
+      document.removeEventListener('pointercancel', onCancel);
+      clearHighlights();
+    };
+
+    const onUp = (ev) => {
+      cleanup();
+
+      const cards = draggedCards;
+      const origin = dragOrigin;
+      draggedCards = [];
+      dragOrigin = null;
+
+      if (moved) {
+        const dropTarget = findDropTarget(ev.clientX, ev.clientY);
+        if (dropTarget && isValidMove(cards, dropTarget)) {
+          executeMove(cards, origin, dropTarget);
+          playSound('card');
+        } else {
+          resetDraggedCards(cards);
+        }
+        return;
+      }
+
+      // Tap without dragging: double-tap/double-click sends the card to a foundation
+      const now = Date.now();
+      if (lastTap.card === cardData && now - lastTap.time < 400) {
+        lastTap = { time: 0, card: null };
+        tryMoveToFoundation(cardData, origin);
+      } else {
+        lastTap = { time: now, card: cardData };
+      }
+    };
+
+    const onCancel = () => {
+      cleanup();
+      const cards = draggedCards;
+      draggedCards = [];
+      dragOrigin = null;
+      resetDraggedCards(cards);
+    };
+
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
+    document.addEventListener('pointercancel', onCancel);
+  });
+}
+
+function tryMoveToFoundation(cardData, origin) {
+  // Only the exposed (last) card of a tableau column can go to a foundation
+  if (origin.type === 'tableau' &&
+      origin.cardIndex !== gameState.tableau[origin.colIndex].length - 1) {
+    return;
+  }
+
+  for (let i = 0; i < 4; i++) {
+    if (isValidMove([{data: cardData}], {type: 'foundation', foundationIndex: i})) {
+      executeMove([{data: cardData}], origin, {type: 'foundation', foundationIndex: i});
+      playSound('card');
+      return;
+    }
+  }
+}
+
+function resetDraggedCards(cards) {
+  cards.forEach(card => {
+    card.element.classList.remove('dragging');
+    card.element.style.transform = '';
+    card.element.style.zIndex = '';
+  });
+  renderGame();
+}
+
+function highlightValidDropZones() {
+  clearHighlights();
+  
+  document.querySelectorAll('.column').forEach((col, i) => {
+    const dropTarget = { type: 'tableau', colIndex: i };
+    if (isValidMove(draggedCards, dropTarget)) {
+      col.classList.add('valid-drop');
+    }
+  });
+  
+  document.querySelectorAll('.foundation').forEach((found, i) => {
+    const dropTarget = { type: 'foundation', foundationIndex: i };
+    if (isValidMove(draggedCards, dropTarget)) {
+      found.classList.add('valid-drop');
+    }
+  });
+}
+
+function clearHighlights() {
+  document.querySelectorAll('.valid-drop').forEach(el => {
+    el.classList.remove('valid-drop');
+  });
+}
+
+function findDropTarget(x, y) {
+  const element = document.elementFromPoint(x, y);
+  if (!element) return null;
+  
+  const column = element.closest('.column');
+  if (column) {
+    return { type: 'tableau', colIndex: parseInt(column.dataset.index) };
+  }
+  
+  const foundation = element.closest('.foundation');
+  if (foundation) {
+    return { type: 'foundation', foundationIndex: parseInt(foundation.dataset.index) };
+  }
+  
+  return null;
+}
+
+/* ==================== MOVE VALIDATION ==================== */
+function isValidMove(cards, dropTarget) {
+  if (cards.length === 0) return false;
+  
+  const firstCard = cards[0].data;
+  
+  if (dropTarget.type === 'foundation') {
+    if (cards.length > 1) return false;
+    
+    const foundationPile = gameState.foundations[dropTarget.foundationIndex];
+    const targetSuit = suits[dropTarget.foundationIndex];
+    if (firstCard.suit !== targetSuit) return false;
+    
+    if (foundationPile.length === 0) {
+      return firstCard.numValue === 1;
+    }
+    
+    const topCard = foundationPile[foundationPile.length - 1];
+    return firstCard.numValue === topCard.numValue + 1;
+  }
+  
+  if (dropTarget.type === 'tableau') {
+    const targetColumn = gameState.tableau[dropTarget.colIndex];
+    
+    if (targetColumn.length === 0) {
+      return firstCard.numValue === 13;
+    }
+    
+    const topCard = targetColumn[targetColumn.length - 1];
+    return firstCard.color !== topCard.color && 
+           firstCard.numValue === topCard.numValue - 1;
+  }
+  
+  return false;
+}
+
+/* ==================== MOVE EXECUTION ==================== */
+function executeMove(cards, origin, destination) {
+  saveStateForUndo();
+  
+  if (origin.type === 'tableau') {
+    gameState.tableau[origin.colIndex].splice(origin.cardIndex);
+    
+    const col = gameState.tableau[origin.colIndex];
+    if (col.length > 0 && !col[col.length - 1].faceUp) {
+      col[col.length - 1].faceUp = true;
+      gameState.score += 5;
+    }
+  } else if (origin.type === 'waste') {
+    gameState.wastePile.pop();
+  } else if (origin.type === 'foundation') {
+    gameState.foundations[origin.foundationIndex].pop();
+    gameState.score -= 10;
+  }
+  
+  if (destination.type === 'tableau') {
+    gameState.tableau[destination.colIndex].push(...cards.map(c => c.data));
+  } else if (destination.type === 'foundation') {
+    gameState.foundations[destination.foundationIndex].push(cards[0].data);
+    gameState.score += 10;
+    playSound('foundation');
+  }
+  
+  gameState.moves++;
+  gameState.score += 1;
+  
+  renderGame();
+  saveGame();
+  checkWin();
+}
+
+/* ==================== DRAW PILE ==================== */
+document.getElementById('draw-pile').addEventListener('click', () => {
+  if (gameState.drawPile.length > 0) {
+    const drawCount = Math.min(3, gameState.drawPile.length);
+    saveStateForUndo();
+    
+    for (let i = 0; i < drawCount; i++) {
+      const card = gameState.drawPile.pop();
+      card.faceUp = true;
+      gameState.wastePile.push(card);
+    }
+    
+    gameState.moves++;
+    playSound('card');
+  } else if (gameState.wastePile.length > 0) {
+    saveStateForUndo();
+    gameState.drawPile = gameState.wastePile.reverse();
+    gameState.wastePile = [];
+    gameState.drawPile.forEach(card => card.faceUp = false);
+    gameState.moves++;
+    playSound('card');
+  }
+  
+  renderGame();
+  saveGame();
+});
+
+/* ==================== UNDO SYSTEM ==================== */
+function saveStateForUndo() {
+  if (gameState.undoStack.length >= 10) {
+    gameState.undoStack.shift();
+  }
+  
+  gameState.undoStack.push({
+    tableau: JSON.parse(JSON.stringify(gameState.tableau)),
+    foundations: JSON.parse(JSON.stringify(gameState.foundations)),
+    drawPile: JSON.parse(JSON.stringify(gameState.drawPile)),
+    wastePile: JSON.parse(JSON.stringify(gameState.wastePile)),
+    moves: gameState.moves,
+    score: gameState.score
+  });
+}
+
+document.getElementById('undo-btn').addEventListener('click', () => {
+  if (gameState.undoStack.length === 0) return;
+  if (!premiumState.unlimitedUndos && gameState.undoCount === 0) return;
+  
+  const previousState = gameState.undoStack.pop();
+  gameState.tableau = previousState.tableau;
+  gameState.foundations = previousState.foundations;
+  gameState.drawPile = previousState.drawPile;
+  gameState.wastePile = previousState.wastePile;
+  gameState.moves = previousState.moves;
+  gameState.score = previousState.score;
+  
+  if (!premiumState.unlimitedUndos) {
+    gameState.undoCount--;
+  }
+  
+  playSound('card');
+  renderGame();
+  saveGame();
+});
+
+/* ==================== HINT SYSTEM ==================== */
+document.getElementById('hint-btn').addEventListener('click', () => {
+  if (!premiumState.unlimitedHints && gameState.hintCount === 0) return;
+  
+  const hint = findHint();
+  
+  if (hint) {
+    if (!premiumState.unlimitedHints) {
+      gameState.hintCount--;
+    }
+    
+    setTimeout(() => {
+      const columns = document.querySelectorAll('.column');
+      if (hint.from.type === 'tableau') {
+        const col = columns[hint.from.colIndex];
+        const card = col.children[hint.from.cardIndex];
+        if (card) {
+          card.classList.add('highlight');
+          setTimeout(() => card.classList.remove('highlight'), 600);
+        }
+      } else if (hint.from.type === 'waste') {
+        const wasteCard = document.querySelector('#waste-pile .card');
+        if (wasteCard) {
+          wasteCard.classList.add('highlight');
+          setTimeout(() => wasteCard.classList.remove('highlight'), 600);
+        }
+      }
+      
+      if (hint.to.type === 'foundation') {
+        const foundation = document.querySelectorAll('.foundation')[hint.to.foundationIndex];
+        foundation.classList.add('valid-drop');
+        setTimeout(() => foundation.classList.remove('valid-drop'), 600);
+      } else if (hint.to.type === 'tableau') {
+        const col = columns[hint.to.colIndex];
+        col.classList.add('valid-drop');
+        setTimeout(() => col.classList.remove('valid-drop'), 600);
+      }
+    }, 100);
+    
+    playSound('peace');
+    renderGame();
+    saveGame();
+  }
+});
+
+function findHint() {
+  if (gameState.wastePile.length > 0) {
+    const card = gameState.wastePile[gameState.wastePile.length - 1];
+    for (let i = 0; i < 4; i++) {
+      if (isValidMove([{data: card}], {type: 'foundation', foundationIndex: i})) {
+        return {
+          from: { type: 'waste' },
+          to: { type: 'foundation', foundationIndex: i }
+        };
+      }
+    }
+  }
+  
+  for (let col = 0; col < 7; col++) {
+    if (gameState.tableau[col].length > 0) {
+      const card = gameState.tableau[col][gameState.tableau[col].length - 1];
+      if (card.faceUp) {
+        for (let i = 0; i < 4; i++) {
+          if (isValidMove([{data: card}], {type: 'foundation', foundationIndex: i})) {
+            return {
+              from: { type: 'tableau', colIndex: col, cardIndex: gameState.tableau[col].length - 1 },
+              to: { type: 'foundation', foundationIndex: i }
+            };
+          }
+        }
+      }
+    }
+  }
+  
+  for (let fromCol = 0; fromCol < 7; fromCol++) {
+    for (let cardIdx = 0; cardIdx < gameState.tableau[fromCol].length; cardIdx++) {
+      const card = gameState.tableau[fromCol][cardIdx];
+      if (!card.faceUp) continue;
+      
+      const cardsToMove = gameState.tableau[fromCol].slice(cardIdx).map(c => ({data: c}));
+      
+      for (let toCol = 0; toCol < 7; toCol++) {
+        if (fromCol === toCol) continue;
+        if (isValidMove(cardsToMove, {type: 'tableau', colIndex: toCol})) {
+          return {
+            from: { type: 'tableau', colIndex: fromCol, cardIndex: cardIdx },
+            to: { type: 'tableau', colIndex: toCol }
+          };
+        }
+      }
+    }
+  }
+  
+  return null;
+}
+
+/* ==================== AUTO-COMPLETE ==================== */
+function canAutoComplete() {
+  for (let col = 0; col < 7; col++) {
+    for (let card of gameState.tableau[col]) {
+      if (!card.faceUp) return false;
+    }
+  }
+  
+  if (gameState.drawPile.length > 0) return false;
+  
+  return true;
+}
+
+document.getElementById('autocomplete-btn').addEventListener('click', () => {
+  if (!premiumState.autoComplete || !canAutoComplete()) return;
+  
+  const interval = setInterval(() => {
+    let moved = false;
+    
+    for (let col = 0; col < 7; col++) {
+      if (gameState.tableau[col].length > 0) {
+        const card = gameState.tableau[col][gameState.tableau[col].length - 1];
+        if (card.faceUp) {
+          for (let i = 0; i < 4; i++) {
+            if (isValidMove([{data: card}], {type: 'foundation', foundationIndex: i})) {
+              executeMove(
+                [{data: card}],
+                { type: 'tableau', colIndex: col, cardIndex: gameState.tableau[col].length - 1 },
+                { type: 'foundation', foundationIndex: i }
+              );
+              moved = true;
+              break;
+            }
+          }
+        }
+        if (moved) break;
+      }
+    }
+    
+    if (!moved && gameState.wastePile.length > 0) {
+      const card = gameState.wastePile[gameState.wastePile.length - 1];
+      for (let i = 0; i < 4; i++) {
+        if (isValidMove([{data: card}], {type: 'foundation', foundationIndex: i})) {
+          executeMove(
+            [{data: card}],
+            { type: 'waste' },
+            { type: 'foundation', foundationIndex: i }
+          );
+          moved = true;
+          break;
+        }
+      }
+    }
+    
+    if (!moved) {
+      clearInterval(interval);
+    }
+  }, 200);
+});
+
+/* ==================== TIMER ==================== */
+function updateTimer() {
+  gameState.timer++;
+  const minutes = Math.floor(gameState.timer / 60);
+  const seconds = gameState.timer % 60;
+  document.getElementById('timer').textContent = 
+    `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+/* ==================== WIN CONDITION ==================== */
+function checkWin() {
+  const totalCards = gameState.foundations.reduce((sum, pile) => sum + pile.length, 0);
+  
+  if (totalCards === 52) {
+    clearInterval(gameState.timerInterval);
+    
+    const timeBonus = Math.max(0, 1000 - gameState.timer);
+    const moveBonus = Math.max(0, 500 - gameState.moves * 2);
+    gameState.score += timeBonus + moveBonus;
+    
+    stats.totalWins++;
+    stats.currentStreak++;
+    stats.bestStreak = Math.max(stats.bestStreak, stats.currentStreak);
+    stats.bestScore = Math.max(stats.bestScore, gameState.score);
+    stats.totalTime += gameState.timer;
+    
+    if (gameState.isDailyChallenge) {
+      const todaySeed = getDailySeed();
+      if (!stats.completedDailies.includes(todaySeed)) {
+        stats.dailyChallengesCompleted++;
+        stats.completedDailies.push(todaySeed);
+      }
+      document.getElementById('daily-complete-box').style.display = 'block';
+    } else {
+      document.getElementById('daily-complete-box').style.display = 'none';
+    }
+    
+    saveStats();
+    
+    softConfetti();
+    
+    setTimeout(() => {
+      document.getElementById('win-moves').textContent = gameState.moves;
+      document.getElementById('win-score').textContent = gameState.score;
+      const minutes = Math.floor(gameState.timer / 60);
+      const seconds = gameState.timer % 60;
+      document.getElementById('win-time').textContent = 
+        `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      document.getElementById('win-modal').classList.add('show');
+    }, 1000);
+    
+    setTimeout(() => tryPeaceMoment(), 1500);
+    
+    playSound('win');
+    saveGame();
+  }
+}
+
+/* ==================== CONFETTI ==================== */
+function softConfetti() {
+  const container = document.getElementById('game');
+  const colors = ['#8a2be2', '#ff1493', '#00ff00', '#ffff00', '#00ffff', '#ff6347'];
+  
+  for (let i = 0; i < 50; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti';
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDelay = Math.random() * 0.5 + 's';
+    piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+    container.appendChild(piece);
+    setTimeout(() => piece.remove(), 4000);
+  }
+}
+
+/* ==================== PEACE MOMENT ==================== */
+function tryPeaceMoment() {
+  if (Math.random() < 0.15) {
+    const peace = document.createElement('div');
+    peace.className = 'peace-outline';
+    document.getElementById('game').appendChild(peace);
+
+    const msg = document.getElementById('peace-message');
+    msg.style.opacity = 1;
+    setTimeout(() => msg.style.opacity = 0, 3000);
+    setTimeout(() => peace.remove(), 2200);
+
+    triggerPeaceReward();
+    playSound('peace');
+  }
+}
+
+function triggerPeaceReward() {
+  if (!premiumState.unlimitedUndos || !premiumState.unlimitedHints) {
+    if (Math.random() < 0.5 && !premiumState.unlimitedUndos) {
+      gameState.undoCount += 10;
+    } else if (!premiumState.unlimitedHints) {
+      gameState.hintCount += 10;
+    }
+  }
+
+  gameState.hasPeaceBack = true;
+  gameState.peaceBackExpires = Date.now() + 48 * 60 * 60 * 1000;
+  
+  saveGame();
+  renderGame();
+}
+
+/* ==================== SHOP SYSTEM ==================== */
+function renderShop() {
+  const container = document.getElementById('shop-items');
+  container.innerHTML = '';
+  
+  shopItems.forEach(item => {
+    const isOwned = premiumState.ownedItems.includes(item.id);
+    const isConsumable = item.type === 'consumable';
+    
+    const div = document.createElement('div');
+    div.className = 'shop-item' + (isOwned && !isConsumable ? ' owned' : '');
+    
+    const badgeHTML = item.badge ? `<span style="background: #ff1493; color: #fff; padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: bold;">${item.badge}</span>` : '';
+    
+    div.innerHTML = `
+      <h3>${item.emoji} ${item.name} ${badgeHTML}</h3>
+      <p>${item.description}</p>
+      <div class="shop-price">
+        ${isOwned && !isConsumable
+          ? '<span class="owned-badge">✓ Owned</span>' 
+          : `<span class="price-tag">$${item.price.toFixed(2)}</span>
+             <button class="btn btn-premium" onclick="purchaseItem('${item.id}')">Buy Now</button>`
+        }
+      </div>
+    `;
+    
+    container.appendChild(div);
+  });
+}
+
+function purchaseItem(itemId) {
+  const item = shopItems.find(i => i.id === itemId);
+  const confirmed = confirm(`Purchase ${item.name} for $${item.price.toFixed(2)}?\n\nThis is a demo. In production, this would process real payment via Stripe/PayPal.`);
+  
+  if (!confirmed) return;
+  
+  // Add to owned items (for permanent items)
+  if (item.type === 'permanent' && !premiumState.ownedItems.includes(itemId)) {
+    premiumState.ownedItems.push(itemId);
+  }
+  
+  // Apply effects
+  switch(itemId) {
+    case 'undo_pack_10':
+      gameState.undoCount += 10;
+      break;
+    case 'undo_pack_50':
+      gameState.undoCount += 50;
+      break;
+    case 'hint_pack_10':
+      gameState.hintCount += 10;
+      break;
+    case 'card_back_pack':
+      premiumState.cardBackPack = true;
+      break;
+    case 'unlimited_hints':
+      premiumState.unlimitedHints = true;
+      gameState.hintCount = 999;
+      break;
+    case 'unlimited_undos':
+      premiumState.unlimitedUndos = true;
+      gameState.undoCount = 999;
+      break;
+    case 'auto_complete':
+      premiumState.autoComplete = true;
+      break;
+    case 'complete_bundle':
+      premiumState.cardBackPack = true;
+      premiumState.unlimitedHints = true;
+      premiumState.unlimitedUndos = true;
+      premiumState.autoComplete = true;
+      gameState.hintCount = 999;
+      gameState.undoCount = 999;
+      ['card_back_pack', 'unlimited_hints', 'unlimited_undos', 'auto_complete'].forEach(id => {
+        if (!premiumState.ownedItems.includes(id)) premiumState.ownedItems.push(id);
+      });
+      break;
+  }
+  
+  savePremium();
+  saveGame();
+  renderShop();
+  renderGame();
+  renderCardBackSelector();
+  
+  playSound('purchase');
+  alert(`✅ Purchase successful!\n\n${item.name} has been ${item.type === 'consumable' ? 'added to your game' : 'unlocked permanently'}!\n\nThank you for your support! 🎉`);
+}
+
+/* ==================== SETTINGS ==================== */
+function renderSettings() {
+  const themeSetting = document.getElementById('theme-setting');
+  const drawSideSetting = document.getElementById('draw-side-setting');
+  const soundSetting = document.getElementById('sound-setting');
+  const musicSetting = document.getElementById('music-setting');
+  
+  // Update theme display
+  const themeIcon = premiumState.theme === 'dark' ? '🌙' : '☀️';
+  const themeText = premiumState.theme === 'dark' ? 'Dark Mode' : 'Light Mode';
+  themeSetting.querySelector('.stat-box-value').textContent = themeIcon;
+  themeSetting.querySelector('.stat-box-label').textContent = `Theme: ${themeText}`;
+  
+  // Update draw side display
+  const drawIcon = premiumState.drawPileOnRight ? '➡️' : '⬅️';
+  const drawText = premiumState.drawPileOnRight ? 'Right Side' : 'Left Side';
+  drawSideSetting.querySelector('.stat-box-value').textContent = drawIcon;
+  drawSideSetting.querySelector('.stat-box-label').textContent = `Draw Pile: ${drawText}`;
+  
+  // Update sound display
+  const soundIcon = gameState.soundEnabled ? '🔊' : '🔇';
+  const soundText = gameState.soundEnabled ? 'On' : 'Off';
+  soundSetting.querySelector('.stat-box-value').textContent = soundIcon;
+  soundSetting.querySelector('.stat-box-label').textContent = `Sound Effects: ${soundText}`;
+  
+  // Update music display
+  const musicIcon = gameState.musicEnabled ? '🎵' : '🔇';
+  const musicText = gameState.musicEnabled ? 'On' : 'Off';
+  musicSetting.querySelector('.stat-box-value').textContent = musicIcon;
+  musicSetting.querySelector('.stat-box-label').textContent = `Music: ${musicText}`;
+  
+  // Add click handlers
+  themeSetting.onclick = () => {
+    premiumState.theme = premiumState.theme === 'dark' ? 'light' : 'dark';
+    applyTheme();
+    savePremium();
+    renderSettings();
+    playSound('card');
+  };
+  
+  drawSideSetting.onclick = () => {
+    premiumState.drawPileOnRight = !premiumState.drawPileOnRight;
+    savePremium();
+    renderSettings();
+    renderGame();
+    playSound('card');
+  };
+  
+  soundSetting.onclick = () => {
+    gameState.soundEnabled = !gameState.soundEnabled;
+    document.getElementById('sound-toggle').textContent = gameState.soundEnabled ? '🔊' : '🔇';
+    saveGame();
+    renderSettings();
+    playSound('card');
+  };
+  
+  musicSetting.onclick = () => {
+    gameState.musicEnabled = !gameState.musicEnabled;
+    toggleBackgroundMusic();
+    saveGame();
+    renderSettings();
+    playSound('card');
+  };
+}
+
+/* ==================== THEME SYSTEM ==================== */
+function applyTheme() {
+  if (premiumState.theme === 'light') {
+    document.body.classList.add('light-mode');
+  } else {
+    document.body.classList.remove('light-mode');
+  }
+}
+
+/* ==================== CARD BACK SELECTOR ==================== */
+function renderCardBackSelector() {
+  const container = document.getElementById('cardback-options');
+  container.innerHTML = '';
+  
+  cardBacks.forEach(back => {
+    const isLocked = back.premium && !premiumState.cardBackPack;
+    const isSelected = premiumState.selectedCardBack === back.id;
+    
+    const div = document.createElement('div');
+    div.className = 'cardback-option' + 
+      (isSelected ? ' selected' : '') + 
+      (isLocked ? ' locked' : '');
+    div.classList.add(back.class);
+    
+    if (!isLocked) {
+      div.onclick = () => selectCardBack(back.id);
+    }
+    
+    container.appendChild(div);
+  });
+}
+
+function selectCardBack(backId) {
+  premiumState.selectedCardBack = backId;
+  savePremium();
+  renderCardBackSelector();
+  renderGame();
+}
+
+/* ==================== STATISTICS ==================== */
+function renderStats() {
+  document.getElementById('total-games').textContent = stats.totalGames;
+  document.getElementById('total-wins').textContent = stats.totalWins;
+  
+  const winRate = stats.totalGames > 0 ? Math.round((stats.totalWins / stats.totalGames) * 100) : 0;
+  document.getElementById('win-rate').textContent = winRate + '%';
+  
+  document.getElementById('current-streak').textContent = stats.currentStreak;
+  document.getElementById('best-streak').textContent = stats.bestStreak;
+  document.getElementById('best-score').textContent = stats.bestScore;
+  document.getElementById('daily-completed').textContent = stats.dailyChallengesCompleted;
+  
+  const totalMinutes = Math.floor(stats.totalTime / 60);
+  const totalSeconds = stats.totalTime % 60;
+  document.getElementById('total-time').textContent = 
+    `${totalMinutes}:${totalSeconds.toString().padStart(2, '0')}`;
+}
+
+/* ==================== SAVE/LOAD ==================== */
+function saveGame() {
+  try {
+    localStorage.setItem('shadowPeaceSolitaire', JSON.stringify({
+      tableau: gameState.tableau,
+      foundations: gameState.foundations,
+      drawPile: gameState.drawPile,
+      wastePile: gameState.wastePile,
+      moves: gameState.moves,
+      score: gameState.score,
+      timer: gameState.timer,
+      undoCount: gameState.undoCount,
+      hintCount: gameState.hintCount,
+      hasPeaceBack: gameState.hasPeaceBack,
+      peaceBackExpires: gameState.peaceBackExpires,
+      soundEnabled: gameState.soundEnabled,
+      musicEnabled: gameState.musicEnabled,
+      isDailyChallenge: gameState.isDailyChallenge,
+      dailySeed: gameState.dailySeed
+    }));
+  } catch(e) {
+    console.log('Save failed:', e);
+  }
+}
+
+function loadGame() {
+  try {
+    const saved = localStorage.getItem('shadowPeaceSolitaire');
+    if (saved) {
+      const data = JSON.parse(saved);
+      
+      if (data.isDailyChallenge && data.dailySeed !== getDailySeed()) {
+        return false;
+      }
+      
+      const foundationCards = data.foundations
+        ? data.foundations.reduce((sum, pile) => sum + pile.length, 0)
+        : 0;
+
+      if (data.tableau && data.moves > 0 && foundationCards < 52) {
+        Object.assign(gameState, data);
+        gameState.undoStack = [];
+        
+        clearInterval(gameState.timerInterval);
+        gameState.timerInterval = setInterval(updateTimer, 1000);
+        
+        renderGame();
+        return true;
+      }
+    }
+  } catch(e) {
+    console.log('Load failed:', e);
+  }
+  return false;
+}
+
+function savePremium() {
+  try {
+    localStorage.setItem('shadowPeacePremium', JSON.stringify(premiumState));
+  } catch(e) {
+    console.log('Premium save failed:', e);
+  }
+}
+
+function loadPremium() {
+  try {
+    const saved = localStorage.getItem('shadowPeacePremium');
+    if (saved) {
+      Object.assign(premiumState, JSON.parse(saved));
+    }
+  } catch(e) {
+    console.log('Premium load failed:', e);
+  }
+}
+
+function saveStats() {
+  try {
+    localStorage.setItem('shadowPeaceStats', JSON.stringify(stats));
+  } catch(e) {
+    console.log('Stats save failed:', e);
+  }
+}
+
+function loadStats() {
+  try {
+    const saved = localStorage.getItem('shadowPeaceStats');
+    if (saved) {
+      Object.assign(stats, JSON.parse(saved));
+    }
+  } catch(e) {
+    console.log('Stats load failed:', e);
+  }
+}
+
+/* ==================== MODAL HANDLERS ==================== */
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.remove('show');
+}
+
+document.getElementById('shop-nav-btn').addEventListener('click', () => {
+  renderShop();
+  document.getElementById('shop-modal').classList.add('show');
+});
+
+document.getElementById('stats-nav-btn').addEventListener('click', () => {
+  renderStats();
+  document.getElementById('stats-modal').classList.add('show');
+});
+
+document.getElementById('cardback-nav-btn').addEventListener('click', () => {
+  renderCardBackSelector();
+  document.getElementById('cardback-modal').classList.add('show');
+});
+
+document.getElementById('settings-nav-btn').addEventListener('click', () => {
+  renderSettings();
+  document.getElementById('settings-modal').classList.add('show');
+});
+
+/* ==================== EVENT HANDLERS ==================== */
+document.getElementById('new-game-btn').addEventListener('click', () => {
+  if (confirm('Start a new game? Current progress will be lost.')) {
+    initGame(false);
+  }
+});
+
+document.getElementById('play-again-btn').addEventListener('click', () => {
+  closeModal('win-modal');
+  initGame(false);
+});
+
+document.getElementById('sound-toggle').addEventListener('click', (e) => {
+  gameState.soundEnabled = !gameState.soundEnabled;
+  e.target.textContent = gameState.soundEnabled ? '🔊' : '🔇';
+  saveGame();
+});
+
+document.getElementById('challenge-banner').addEventListener('click', () => {
+  if (confirm('Start today\'s daily challenge? Current progress will be lost.')) {
+    initGame(true);
+  }
+});
+
+document.querySelectorAll('.modal').forEach(modal => {
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.classList.remove('show');
+    }
+  });
+});
+
+/* ==================== INITIALIZE ==================== */
+loadPremium();
+loadStats();
+applyTheme();
+
+if (!loadGame()) {
+  initGame(true);
+}
+
+document.getElementById('sound-toggle').textContent = gameState.soundEnabled ? '🔊' : '🔇';
+
+// Menu toggle functionality
+const menuToggle = document.getElementById('menu-toggle');
+const navButtons = document.getElementById('nav-buttons');
+let menuOpen = false;
+
+menuToggle.addEventListener('click', () => {
+  menuOpen = !menuOpen;
+  if (menuOpen) {
+    navButtons.classList.remove('collapsed');
+    menuToggle.classList.add('active');
+    menuToggle.textContent = '✕';
+  } else {
+    navButtons.classList.add('collapsed');
+    menuToggle.classList.remove('active');
+    menuToggle.textContent = '☰';
+  }
+});
+
+// Close menu when clicking a nav button
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    navButtons.classList.add('collapsed');
+    menuToggle.classList.remove('active');
+    menuToggle.textContent = '☰';
+    menuOpen = false;
+  });
+});
+
+// Start background music if enabled (after user interaction)
+if (gameState.musicEnabled) {
+  document.addEventListener('click', () => {
+    if (gameState.musicEnabled && !musicOscillator) {
+      startBackgroundMusic();
+    }
+  }, { once: true });
+}
+</script>
+</body>
+</html>
