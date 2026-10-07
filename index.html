@@ -19,10 +19,11 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   min-height: 100vh;
+  min-height: 100dvh;
   color: #ddd;
-  padding: 20px;
+  padding: 12px 12px 90px;
   transition: background 0.5s ease, color 0.5s ease;
 }
 
@@ -126,10 +127,11 @@ body.light-mode #menu-toggle.active {
 }
 
 #game {
+  --gap: 4px;
   width: min(100%, 420px);
   background: rgba(26, 26, 26, 0.95);
   border-radius: 20px;
-  padding: 16px;
+  padding: 12px;
   position: relative;
   box-shadow: 0 0 40px rgba(138, 43, 226, 0.3);
   overflow: hidden;
@@ -141,8 +143,8 @@ body.light-mode #menu-toggle.active {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
-  padding: 8px;
+  margin-bottom: 10px;
+  padding: 6px 8px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
 }
@@ -214,41 +216,48 @@ body.light-mode #menu-toggle.active {
   background: linear-gradient(135deg, #ffed4e, #ffd700);
 }
 
-/* TOP ROW */
+/* TOP ROW: a 7 column grid so it lines up exactly with the tableau below */
 #top-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-  gap: 4px;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--gap);
+  margin-bottom: 12px;
   width: 100%;
 }
 
-#top-row.draw-left .foundation-group {
-  order: 2;
-}
-
-#top-row.draw-left .pile-group {
-  order: 1;
-}
-
 .foundation-group, .pile-group {
-  display: flex;
-  gap: 3px;
+  display: contents;
 }
+
+/* draw pile on the right (default): foundations 1-4, waste 6, draw 7 */
+.foundation:nth-child(1) { grid-column: 1; }
+.foundation:nth-child(2) { grid-column: 2; }
+.foundation:nth-child(3) { grid-column: 3; }
+.foundation:nth-child(4) { grid-column: 4; }
+#waste-pile { grid-column: 6; grid-row: 1; }
+#draw-pile { grid-column: 7; grid-row: 1; }
+.foundation { grid-row: 1; }
+
+/* draw pile on the left: draw 1, waste 2, foundations 4-7 */
+#top-row.draw-left #draw-pile { grid-column: 1; }
+#top-row.draw-left #waste-pile { grid-column: 2; }
+#top-row.draw-left .foundation:nth-child(1) { grid-column: 4; }
+#top-row.draw-left .foundation:nth-child(2) { grid-column: 5; }
+#top-row.draw-left .foundation:nth-child(3) { grid-column: 6; }
+#top-row.draw-left .foundation:nth-child(4) { grid-column: 7; }
 
 .foundation, .pile {
-  width: 48px;
-  height: 66px;
-  border-radius: 8px;
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  border-radius: 6px;
   border: 2px dashed rgba(138, 43, 226, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   background: rgba(0, 0, 0, 0.3);
-  transition: all 0.3s;
-  flex-shrink: 0;
+  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+  min-width: 0;
 }
 
 .foundation.valid-drop, .pile.valid-drop {
@@ -259,7 +268,7 @@ body.light-mode #menu-toggle.active {
 
 .foundation::before {
   content: attr(data-suit);
-  font-size: 20px;
+  font-size: clamp(14px, 5vw, 28px);
   opacity: 0.2;
 }
 
@@ -276,39 +285,45 @@ body.light-mode #menu-toggle.active {
 
 #draw-pile::before {
   content: '🎴';
-  font-size: 24px;
+  font-size: clamp(16px, 5vw, 32px);
   opacity: 0.6;
 }
 
 #draw-pile.empty::before {
   content: '↻';
-  font-size: 28px;
+  font-size: clamp(18px, 6vw, 36px);
 }
 
 /* TABLEAU */
 #tableau {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-  gap: 4px;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--gap);
   width: 100%;
-  overflow: visible;
+  align-items: start;
 }
 
 .column {
-  flex: 1;
   min-width: 0;
   min-height: 300px;
   position: relative;
-  border-radius: 10px;
-  border: 2px dashed transparent;
-  transition: all 0.3s;
-  padding: 2px;
+  border-radius: 6px;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+/* faint slot outline so empty columns are still a visible drop target */
+.column::before {
+  content: '';
+  display: block;
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  border-radius: 6px;
+  border: 2px dashed rgba(138, 43, 226, 0.18);
 }
 
 .column.valid-drop {
-  border-color: rgba(138, 43, 226, 0.6);
-  background: rgba(138, 43, 226, 0.1);
+  background: rgba(138, 43, 226, 0.12);
+  box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.6);
 }
 
 /* CARD */
@@ -319,11 +334,14 @@ body.light-mode #menu-toggle.active {
   border-radius: 6px;
   background: linear-gradient(145deg, #ffffff, #f0f0f0);
   color: #111;
-  font-size: 14px;
+  font-size: clamp(11px, 3.6vw, 20px);
   font-weight: bold;
+  line-height: 1;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 3px 0 0 4px;
+  overflow: hidden;
   cursor: grab;
   position: absolute;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
@@ -340,6 +358,22 @@ body.light-mode #menu-toggle.active {
 
 .card.red {
   color: #c41e3a;
+}
+
+.foundation .card, .pile .card {
+  top: -2px;
+  left: -2px;
+  width: calc(100% + 4px);
+}
+
+/* big suit in the middle of the face */
+.card:not(.face-down)::after {
+  content: attr(data-suit);
+  position: absolute;
+  right: 12%;
+  bottom: 8%;
+  font-size: 2.2em;
+  opacity: 0.85;
 }
 
 .card.face-down {
@@ -394,7 +428,9 @@ body.light-mode #menu-toggle.active {
 .card.face-down::before {
   content: '✦';
   color: rgba(255, 255, 255, 0.3);
-  font-size: 24px;
+  font-size: 1.6em;
+  margin: auto;
+  padding: 0;
 }
 
 .card.dragging {
@@ -623,9 +659,9 @@ body.light-mode #menu-toggle.active {
 /* DAILY CHALLENGE */
 .challenge-banner {
   background: linear-gradient(135deg, #8a2be2, #da70d6);
-  padding: 15px;
+  padding: 8px 52px 8px 12px;
   border-radius: 12px;
-  margin-bottom: 15px;
+  margin-bottom: 8px;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -648,13 +684,13 @@ body.light-mode #menu-toggle.active {
 }
 
 .challenge-banner h3 {
-  margin: 0 0 5px;
-  font-size: 18px;
+  margin: 0 0 2px;
+  font-size: 15px;
   color: #fff;
 }
 
 .challenge-timer {
-  font-size: 14px;
+  font-size: 12px;
   color: rgba(255, 255, 255, 0.9);
 }
 
@@ -771,18 +807,18 @@ body.light-mode #menu-toggle.active {
 /* SOUND TOGGLE */
 #sound-toggle {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 12px;
+  right: 12px;
   background: rgba(138, 43, 226, 0.3);
   border: 1px solid rgba(138, 43, 226, 0.5);
   border-radius: 50%;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 18px;
   transition: all 0.3s;
   z-index: 100;
 }
@@ -862,28 +898,31 @@ body.light-mode #menu-toggle.active {
 
 /* RESPONSIVE */
 @media (max-width: 480px) {
+  body {
+    padding: 6px 6px 90px;
+  }
+
   #game {
-    padding: 12px;
+    width: 100%;
+    padding: 8px;
+    border-radius: 14px;
+    --gap: 3px;
   }
-  
-  .card {
-    font-size: 14px;
-  }
-  
+
   #header {
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
   }
-  
+
   .btn {
     font-size: 10px;
     padding: 6px 10px;
   }
-  
+
   .cardback-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   #nav-buttons {
     flex-wrap: wrap;
     justify-content: center;
@@ -891,37 +930,17 @@ body.light-mode #menu-toggle.active {
 }
 
 @media (min-width: 768px) {
+  body {
+    align-items: center;
+  }
+
   #game {
+    --gap: 8px;
     width: 700px;
   }
-  
+
   .card {
-    font-size: 20px;
-  }
-  
-  .foundation, .pile {
-    width: 80px;
-    height: 112px;
-  }
-  
-  .foundation::before {
-    font-size: 28px;
-  }
-  
-  #draw-pile::before {
-    font-size: 32px;
-  }
-  
-  #draw-pile.empty::before {
-    font-size: 36px;
-  }
-  
-  .foundation-group, .pile-group {
-    gap: 6px;
-  }
-  
-  #top-row {
-    gap: 8px;
+    padding: 5px 0 0 7px;
   }
 }
 </style>
@@ -1557,12 +1576,26 @@ function renderGame() {
     autoBtn.title = 'Purchase Auto-Complete in Shop';
   }
   
-  document.querySelectorAll('.column').forEach((col, i) => {
+  // Stack spacing scales with the card size so any screen looks right:
+  // face-down cards overlap a lot, face-up cards show their rank corner.
+  const cols = document.querySelectorAll('.column');
+  const cardW = cols[0].clientWidth || 44;
+  const cardH = cardW * 7 / 5;
+  const downStep = Math.max(8, Math.round(cardH * 0.16));
+  const upStep = Math.max(16, Math.round(cardH * 0.32));
+  cols.forEach((col, i) => {
     col.innerHTML = '';
-    col.style.minHeight = Math.max(300, gameState.tableau[i].length * 25 + 140) + 'px';
+    let y = 0;
+    const tops = gameState.tableau[i].map(card => {
+      const top = y;
+      y += card.faceUp ? upStep : downStep;
+      return top;
+    });
+    const stackH = tops.length ? tops[tops.length - 1] + cardH : cardH;
+    col.style.minHeight = Math.max(cardH * 3.5, stackH + cardH * 1.2) + 'px';
     gameState.tableau[i].forEach((card, j) => {
       const cardEl = createCardElement(card);
-      cardEl.style.top = `${j * 25}px`;
+      cardEl.style.top = `${tops[j]}px`;
       cardEl.style.zIndex = j;
       cardEl.dataset.location = 'tableau';
       cardEl.dataset.columnIndex = i;
@@ -1599,6 +1632,15 @@ function renderGame() {
   }
 }
 
+// Re-layout when the screen size or orientation changes (not mid-drag)
+let resizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (draggedCards.length === 0 && typeof gameState !== 'undefined') renderGame();
+  }, 120);
+});
+
 function createCardElement(cardData) {
   const card = document.createElement('div');
   card.className = 'card';
@@ -1609,6 +1651,7 @@ function createCardElement(cardData) {
     card.classList.add(backClass);
   } else {
     card.textContent = cardData.value + cardData.suit;
+    card.dataset.suit = cardData.suit;
     if (cardData.color === 'red') card.classList.add('red');
     enableDrag(card, cardData);
   }
