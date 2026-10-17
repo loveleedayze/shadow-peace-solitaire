@@ -18,12 +18,10 @@ body {
   background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
   font-family: system-ui, -apple-system, sans-serif;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
   min-height: 100vh;
   min-height: 100dvh;
   color: #ddd;
-  padding: 12px 12px 90px;
+  padding: 12px;
   transition: background 0.5s ease, color 0.5s ease;
 }
 
@@ -126,8 +124,10 @@ body.light-mode #menu-toggle.active {
   border-color: rgba(220, 53, 69, 0.8);
 }
 
+/* Auto margins center the board on both axes, and collapse to 0 (no clipping) when it's taller than the screen */
 #game {
   --gap: 4px;
+  margin: auto;
   width: min(100%, 420px);
   background: rgba(26, 26, 26, 0.95);
   border-radius: 20px;
@@ -829,9 +829,10 @@ body.light-mode #menu-toggle.active {
 }
 
 /* NAV BUTTONS */
+/* Sits just above the 56px menu toggle so the toggle never covers a menu item */
 #nav-buttons {
   position: fixed;
-  bottom: 20px;
+  bottom: 88px;
   right: 20px;
   display: flex;
   flex-direction: column;
@@ -862,6 +863,13 @@ body.light-mode #menu-toggle.active {
   z-index: 101;
   transition: all 0.3s;
   box-shadow: 0 4px 12px rgba(138, 43, 226, 0.5);
+  animation: menu-glow 2.4s ease-in-out infinite;
+}
+
+/* Soft pulsing glow so players notice the menu (and the shop inside it) */
+@keyframes menu-glow {
+  0%, 100% { box-shadow: 0 4px 12px rgba(138, 43, 226, 0.5), 0 0 0 0 rgba(186, 104, 255, 0); }
+  50%      { box-shadow: 0 4px 12px rgba(138, 43, 226, 0.5), 0 0 22px 6px rgba(186, 104, 255, 0.65); }
 }
 
 #menu-toggle:hover {
@@ -872,6 +880,14 @@ body.light-mode #menu-toggle.active {
 #menu-toggle.active {
   background: rgba(220, 53, 69, 0.9);
   border-color: rgba(220, 53, 69, 0.8);
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #menu-toggle {
+    animation: none;
+    box-shadow: 0 4px 12px rgba(138, 43, 226, 0.5), 0 0 16px 4px rgba(186, 104, 255, 0.5);
+  }
 }
 
 .nav-btn {
@@ -899,7 +915,7 @@ body.light-mode #menu-toggle.active {
 /* RESPONSIVE */
 @media (max-width: 480px) {
   body {
-    padding: 6px 6px 90px;
+    padding: 6px;
   }
 
   #game {
@@ -930,10 +946,6 @@ body.light-mode #menu-toggle.active {
 }
 
 @media (min-width: 768px) {
-  body {
-    align-items: center;
-  }
-
   #game {
     --gap: 8px;
     width: 700px;
@@ -1211,34 +1223,6 @@ const cardBacks = [
 
 /* ==================== SHOP ITEMS ==================== */
 const shopItems = [
-  {
-    id: 'undo_pack_10',
-    name: '10 Undo Pack',
-    description: 'Add 10 undos to your current game',
-    price: 0.99,
-    emoji: '↶',
-    type: 'consumable',
-    quantity: 10
-  },
-  {
-    id: 'undo_pack_50',
-    name: '50 Undo Pack',
-    description: 'Add 50 undos - Best Value!',
-    price: 3.99,
-    emoji: '↶↶',
-    type: 'consumable',
-    quantity: 50,
-    badge: '20% OFF'
-  },
-  {
-    id: 'hint_pack_10',
-    name: '10 Hint Pack',
-    description: 'Add 10 hints to your current game',
-    price: 0.99,
-    emoji: '💡',
-    type: 'consumable',
-    quantity: 10
-  },
   {
     id: 'card_back_pack',
     name: 'Card Back Pack',
@@ -2294,10 +2278,9 @@ function renderShop() {
   
   shopItems.forEach(item => {
     const isOwned = premiumState.ownedItems.includes(item.id);
-    const isConsumable = item.type === 'consumable';
-    
+
     const div = document.createElement('div');
-    div.className = 'shop-item' + (isOwned && !isConsumable ? ' owned' : '');
+    div.className = 'shop-item' + (isOwned ? ' owned' : '');
     
     const badgeHTML = item.badge ? `<span style="background: #ff1493; color: #fff; padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: bold;">${item.badge}</span>` : '';
     
@@ -2305,8 +2288,8 @@ function renderShop() {
       <h3>${item.emoji} ${item.name} ${badgeHTML}</h3>
       <p>${item.description}</p>
       <div class="shop-price">
-        ${isOwned && !isConsumable
-          ? '<span class="owned-badge">✓ Owned</span>' 
+        ${isOwned
+          ?'<span class="owned-badge">✓ Owned</span>' 
           : `<span class="price-tag">$${item.price.toFixed(2)}</span>
              <button class="btn btn-premium" onclick="purchaseItem('${item.id}')">Buy Now</button>`
         }
@@ -2330,15 +2313,6 @@ function purchaseItem(itemId) {
   
   // Apply effects
   switch(itemId) {
-    case 'undo_pack_10':
-      gameState.undoCount += 10;
-      break;
-    case 'undo_pack_50':
-      gameState.undoCount += 50;
-      break;
-    case 'hint_pack_10':
-      gameState.hintCount += 10;
-      break;
     case 'card_back_pack':
       premiumState.cardBackPack = true;
       break;
@@ -2373,7 +2347,7 @@ function purchaseItem(itemId) {
   renderCardBackSelector();
   
   playSound('purchase');
-  alert(`✅ Purchase successful!\n\n${item.name} has been ${item.type === 'consumable' ? 'added to your game' : 'unlocked permanently'}!\n\nThank you for your support! 🎉`);
+  alert(`✅ Purchase successful!\n\n${item.name} has been unlocked permanently!\n\nThank you for your support! 🎉`);
 }
 
 /* ==================== SETTINGS ==================== */
