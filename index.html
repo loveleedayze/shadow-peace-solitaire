@@ -522,6 +522,18 @@ body.light-mode #menu-toggle.active {
   margin: 20px 0;
 }
 
+.shop-note {
+  margin: 0 0 14px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(138, 43, 226, 0.18);
+  border: 1px solid rgba(138, 43, 226, 0.5);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+[hidden] { display: none !important; }
+
 .shop-item {
   background: rgba(255, 255, 255, 0.05);
   border: 2px solid rgba(138, 43, 226, 0.3);
@@ -1067,6 +1079,7 @@ body.light-mode #menu-toggle.active {
   <div class="modal-content">
     <button class="modal-close" onclick="closeModal('shop-modal')">×</button>
     <h2>🛒 Premium Shop</h2>
+    <p class="shop-note" id="shop-note" hidden></p>
     <div class="shop-grid" id="shop-items"></div>
   </div>
 </div>
@@ -1229,7 +1242,8 @@ const shopItems = [
     description: '10 beautiful card back designs',
     price: 2.99,
     emoji: '🎨',
-    type: 'permanent'
+    type: 'permanent',
+    paymentLink: ''
   },
   {
     id: 'unlimited_hints',
@@ -1237,7 +1251,8 @@ const shopItems = [
     description: 'Never run out of hints again',
     price: 4.99,
     emoji: '💡',
-    type: 'permanent'
+    type: 'permanent',
+    paymentLink: ''
   },
   {
     id: 'unlimited_undos',
@@ -1245,23 +1260,26 @@ const shopItems = [
     description: 'Undo as many times as you want',
     price: 4.99,
     emoji: '↶',
-    type: 'permanent'
+    type: 'permanent',
+    paymentLink: ''
   },
   {
     id: 'auto_complete',
     name: 'Auto-Complete',
     description: 'Finish games automatically when solvable',
-    price: 1.99,
+    price: 4.99,
     emoji: '✨',
-    type: 'permanent'
+    type: 'permanent',
+    paymentLink: ''
   },
   {
     id: 'complete_bundle',
     name: 'Complete Bundle',
-    description: 'All permanent upgrades! Save $4',
+    description: 'All permanent upgrades! Save $7.97',
     price: 9.99,
     emoji: '🎁',
     type: 'permanent',
+    paymentLink: '',
     badge: 'BEST DEAL'
   }
 ];
@@ -1413,10 +1431,52 @@ function toggleBackgroundMusic() {
 }
 
 /* ==================== DAILY CHALLENGE ==================== */
-function getDailySeed() {
+function todayKey() {
   const today = new Date();
-  const dateString = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
-  return hashString(dateString);
+  return `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+}
+
+function getDailySeed() {
+  return hashString(todayKey());
+}
+
+/* ==================== DAILY ALLOWANCE ==================== */
+// Free undos/hints are shared by every game in a day and refill at midnight
+const DAILY_FREE = 3;
+
+function applyDailyAllowance() {
+  let saved = null;
+  try {
+    saved = JSON.parse(localStorage.getItem('shadowPeaceAllowance'));
+  } catch(e) {}
+  const sameDay = saved && saved.date === todayKey();
+  const peaceActive = gameState.hasPeaceBack && gameState.peaceBackExpires > Date.now();
+  const refill = current => peaceActive ? Math.max(DAILY_FREE, current) : DAILY_FREE;
+
+  gameState.undoCount = premiumState.unlimitedUndos ? 999
+    : sameDay ? saved.undoCount : refill(gameState.undoCount);
+  gameState.hintCount = premiumState.unlimitedHints ? 999
+    : sameDay ? saved.hintCount : refill(gameState.hintCount);
+}
+
+function saveDailyAllowance() {
+  try {
+    localStorage.setItem('shadowPeaceAllowance', JSON.stringify({
+      date: todayKey(),
+      undoCount: gameState.undoCount,
+      hintCount: gameState.hintCount
+    }));
+  } catch(e) {}
+}
+
+function showOutOfFree(kind) {
+  const itemId = kind === 'undos' ? 'unlimited_undos' : 'unlimited_hints';
+  const item = shopItems.find(i => i.id === itemId);
+  renderShop();
+  const note = document.getElementById('shop-note');
+  note.textContent = `You've used today's ${DAILY_FREE} free ${kind}. They refill at midnight, or get ${item.name} for $${item.price.toFixed(2)}.`;
+  note.hidden = false;
+  document.getElementById('shop-modal').classList.add('show');
 }
 
 function hashString(str) {
@@ -1507,21 +1567,7 @@ function initGame(isDailyChallenge = false) {
   gameState.isDailyChallenge = isDailyChallenge;
   gameState.dailySeed = seed;
   
-  if (premiumState.unlimitedUndos) {
-    gameState.undoCount = 999;
-  } else if (gameState.hasPeaceBack && gameState.peaceBackExpires > Date.now()) {
-    gameState.undoCount = Math.max(3, gameState.undoCount);
-  } else {
-    gameState.undoCount = 3;
-  }
-  
-  if (premiumState.unlimitedHints) {
-    gameState.hintCount = 999;
-  } else if (gameState.hasPeaceBack && gameState.peaceBackExpires > Date.now()) {
-    gameState.hintCount = Math.max(3, gameState.hintCount);
-  } else {
-    gameState.hintCount = 3;
-  }
+  applyDailyAllowance();
   
   for (let col = 0; col < 7; col++) {
     for (let row = 0; row <= col; row++) {
@@ -1557,8 +1603,7 @@ function renderGame() {
   document.getElementById('score').textContent = gameState.score;
   document.getElementById('undo-count').textContent = premiumState.unlimitedUndos ? '∞' : gameState.undoCount;
   document.getElementById('hint-count').textContent = premiumState.unlimitedHints ? '∞' : gameState.hintCount;
-  document.getElementById('undo-btn').disabled = gameState.undoStack.length === 0 || (!premiumState.unlimitedUndos && gameState.undoCount === 0);
-  document.getElementById('hint-btn').disabled = !premiumState.unlimitedHints && gameState.hintCount === 0;
+  document.getElementById('undo-btn').disabled = gameState.undoStack.length === 0;
   
   const autoBtn = document.getElementById('autocomplete-btn');
   if (premiumState.autoComplete) {
@@ -1987,7 +2032,7 @@ function saveStateForUndo() {
 
 document.getElementById('undo-btn').addEventListener('click', () => {
   if (gameState.undoStack.length === 0) return;
-  if (!premiumState.unlimitedUndos && gameState.undoCount === 0) return;
+  if (!premiumState.unlimitedUndos && gameState.undoCount === 0) return showOutOfFree('undos');
   
   const previousState = gameState.undoStack.pop();
   gameState.tableau = previousState.tableau;
@@ -2009,7 +2054,7 @@ document.getElementById('undo-btn').addEventListener('click', () => {
 
 /* ==================== HINT SYSTEM ==================== */
 document.getElementById('hint-btn').addEventListener('click', () => {
-  if (!premiumState.unlimitedHints && gameState.hintCount === 0) return;
+  if (!premiumState.unlimitedHints && gameState.hintCount === 0) return showOutOfFree('hints');
   
   const hint = findHint();
   
@@ -2302,10 +2347,24 @@ function renderShop() {
 
 function purchaseItem(itemId) {
   const item = shopItems.find(i => i.id === itemId);
+
+  // Real payment: send to the Stripe Payment Link, which redirects back with ?unlock=<id>
+  if (item.paymentLink) {
+    window.location.href = item.paymentLink;
+    return;
+  }
+
   const confirmed = confirm(`Purchase ${item.name} for $${item.price.toFixed(2)}?\n\nThis is a demo. In production, this would process real payment via Stripe/PayPal.`);
-  
+
   if (!confirmed) return;
-  
+
+  unlockItem(itemId);
+}
+
+function unlockItem(itemId) {
+  const item = shopItems.find(i => i.id === itemId);
+  if (!item) return;
+
   // Add to owned items (for permanent items)
   if (item.type === 'permanent' && !premiumState.ownedItems.includes(itemId)) {
     premiumState.ownedItems.push(itemId);
@@ -2509,6 +2568,7 @@ function saveGame() {
   } catch(e) {
     console.log('Save failed:', e);
   }
+  saveDailyAllowance();
 }
 
 function loadGame() {
@@ -2528,6 +2588,7 @@ function loadGame() {
       if (data.tableau && data.moves > 0 && foundationCards < 52) {
         Object.assign(gameState, data);
         gameState.undoStack = [];
+        applyDailyAllowance();
         
         clearInterval(gameState.timerInterval);
         gameState.timerInterval = setInterval(updateTimer, 1000);
@@ -2586,6 +2647,7 @@ function closeModal(modalId) {
 }
 
 document.getElementById('shop-nav-btn').addEventListener('click', () => {
+  document.getElementById('shop-note').hidden = true;
   renderShop();
   document.getElementById('shop-modal').classList.add('show');
 });
@@ -2645,6 +2707,16 @@ applyTheme();
 if (!loadGame()) {
   initGame(true);
 }
+
+// Returning from a Stripe Payment Link: ?unlock=<itemId>&session_id=cs_...
+(function handlePaymentReturn() {
+  const params = new URLSearchParams(window.location.search);
+  const itemId = params.get('unlock');
+  const sessionId = params.get('session_id') || '';
+  if (!itemId) return;
+  history.replaceState(null, '', window.location.pathname);
+  if (sessionId.startsWith('cs_')) unlockItem(itemId);
+})();
 
 document.getElementById('sound-toggle').textContent = gameState.soundEnabled ? '🔊' : '🔇';
 
