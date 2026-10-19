@@ -1474,7 +1474,7 @@ function showOutOfFree(kind) {
   const item = shopItems.find(i => i.id === itemId);
   renderShop();
   const note = document.getElementById('shop-note');
-  note.textContent = `You've used today's ${DAILY_FREE} free ${kind}. They refill at midnight, or get ${item.name} for $${item.price.toFixed(2)}.`;
+  note.textContent = `You've used today's ${DAILY_FREE} free ${kind}. Get unlimited for $${item.price.toFixed(2)}.`;
   note.hidden = false;
   document.getElementById('shop-modal').classList.add('show');
 }
