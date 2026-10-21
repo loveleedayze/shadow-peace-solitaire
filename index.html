@@ -6,6 +6,10 @@
 <meta name="description" content="Shadow Peace Solitaire - Daily challenges, premium card backs, and zen gameplay" />
 <meta name="theme-color" content="#8a2be2" />
 <link rel="manifest" href="manifest.json" />
+<link rel="icon" type="image/png" href="icons/favicon.png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
 <title>Shadow Peace Solitaire - Daily Challenge</title>
 
 <style>
@@ -2345,8 +2349,31 @@ function renderShop() {
   });
 }
 
+const OFFLINE_SHOP_MSG = "You're offline 🌙 Connect to the internet to purchase. Your game keeps working offline, so play on!";
+
+function showOfflineShopNote() {
+  const note = document.getElementById('shop-note');
+  note.textContent = OFFLINE_SHOP_MSG;
+  note.hidden = false;
+}
+
+// Keep the shop note in sync if the connection drops or returns while the shop is open
+window.addEventListener('offline', () => {
+  if (document.getElementById('shop-modal').classList.contains('show')) showOfflineShopNote();
+});
+window.addEventListener('online', () => {
+  const note = document.getElementById('shop-note');
+  if (note.textContent === OFFLINE_SHOP_MSG) note.hidden = true;
+});
+
 function purchaseItem(itemId) {
   const item = shopItems.find(i => i.id === itemId);
+
+  // Payments are online only
+  if (!navigator.onLine) {
+    showOfflineShopNote();
+    return;
+  }
 
   // Real payment: send to the Stripe Payment Link, which redirects back with ?unlock=<id>
   if (item.paymentLink) {
@@ -2648,6 +2675,7 @@ function closeModal(modalId) {
 
 document.getElementById('shop-nav-btn').addEventListener('click', () => {
   document.getElementById('shop-note').hidden = true;
+  if (!navigator.onLine) showOfflineShopNote();
   renderShop();
   document.getElementById('shop-modal').classList.add('show');
 });
@@ -2755,6 +2783,13 @@ if (gameState.musicEnabled) {
       startBackgroundMusic();
     }
   }, { once: true });
+}
+
+// Offline support: cache the game so it runs with no connection
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
 }
 </script>
 </body>

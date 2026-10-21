@@ -20,7 +20,11 @@ Any static host works. Two free options:
 
 **GitHub Pages** (this repo): Settings → Pages → deploy from the `main` branch, root folder. Your game will be live at `https://<username>.github.io/shadow-peace-solitaire/`.
 
-**Netlify Drop:** drag `index.html` and `manifest.json` onto https://app.netlify.com/drop and get an instant URL.
+**Netlify Drop:** drag the whole folder (`index.html`, `manifest.json`, `sw.js`, `icons/`) onto https://app.netlify.com/drop and get an instant URL.
+
+## Offline / installable (PWA)
+
+Once hosted, the game can be installed to a phone or desktop and plays with no connection. `sw.js` caches the game files, and the shop shows a "connect to the internet to purchase" note while offline. **When you change any file, bump `CACHE_VERSION` in `sw.js`** so players get the update. Service workers don't run from a double-clicked `index.html`, so to test locally run `python -m http.server 8123` in this folder and open http://localhost:8123.
 
 ## Making money from it
 
